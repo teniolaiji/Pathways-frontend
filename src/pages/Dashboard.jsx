@@ -1,15 +1,21 @@
 import { useState, useEffect } from "react";
 import {
-  Sidebar, PageShell, PageHeader,
-  Card, PrimaryBtn, ProgressBar,
-  EmptyState, Spinner, T,
-} from "../components/shared";
+  Sidebar,
+  PageShell,
+  PageHeader,
+  Card,
+  PrimaryBtn,
+  ProgressBar,
+  EmptyState,
+  Spinner,
+  T,
+} from "../components/Shared";
 import API from "../config";
 
 export default function Dashboard({ user, token, onNavigate, onLogout }) {
-  const [pathways, setPathways]       = useState([]);
+  const [pathways, setPathways] = useState([]);
   const [allProgress, setAllProgress] = useState([]);
-  const [loading, setLoading]         = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const auth = { Authorization: `Bearer ${token}` };
 
@@ -37,16 +43,18 @@ export default function Dashboard({ user, token, onNavigate, onLogout }) {
 
   // ── Aggregate stats ────────────────────────────────────────────
   const totalModulesDone = allProgress.reduce(
-    (acc, p) => acc + (p.completedModules || 0), 0
+    (acc, p) => acc + (p.completedModules || 0),
+    0,
   );
   const totalBadges = allProgress.reduce(
-    (acc, p) => acc + (p.badgesEarned || 0), 0
+    (acc, p) => acc + (p.badgesEarned || 0),
+    0,
   );
   const avgCompletion =
     allProgress.length > 0
       ? Math.round(
           allProgress.reduce((acc, p) => acc + p.completionRate, 0) /
-            allProgress.length
+            allProgress.length,
         )
       : 0;
 
@@ -67,10 +75,30 @@ export default function Dashboard({ user, token, onNavigate, onLogout }) {
 
         {/* ── Stats row ── */}
         <div style={layout.statsRow}>
-          <StatCard icon="📚" label="Pathways"        value={pathways.length}      accent={T.purple500} />
-          <StatCard icon="✅" label="Modules Done"    value={totalModulesDone}     accent={T.purple600} />
-          <StatCard icon="🏅" label="Badges Earned"  value={totalBadges}          accent={T.purple700} />
-          <StatCard icon="📈" label="Avg Completion" value={`${avgCompletion}%`}  accent={T.purple500} />
+          <StatCard
+            icon="📚"
+            label="Pathways"
+            value={pathways.length}
+            accent={T.purple500}
+          />
+          <StatCard
+            icon="✅"
+            label="Modules Done"
+            value={totalModulesDone}
+            accent={T.purple600}
+          />
+          <StatCard
+            icon="🏅"
+            label="Badges Earned"
+            value={totalBadges}
+            accent={T.purple700}
+          />
+          <StatCard
+            icon="📈"
+            label="Avg Completion"
+            value={`${avgCompletion}%`}
+            accent={T.purple500}
+          />
         </div>
 
         {/* ── Quick actions ── */}
@@ -129,7 +157,7 @@ export default function Dashboard({ user, token, onNavigate, onLogout }) {
             <div style={layout.pathwayGrid}>
               {pathways.slice(0, 3).map((p) => {
                 const prog = allProgress.find(
-                  (pr) => pr.pathwayId?.toString() === p._id?.toString()
+                  (pr) => pr.pathwayId?.toString() === p._id?.toString(),
                 );
                 const pct = prog?.completionRate ?? 0;
                 const done = prog?.completedModules ?? 0;
@@ -147,9 +175,7 @@ export default function Dashboard({ user, token, onNavigate, onLogout }) {
                         ? " · " +
                           p.assessment.subfield
                             .split("_")
-                            .map(
-                              (w) => w.charAt(0).toUpperCase() + w.slice(1)
-                            )
+                            .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
                             .join(" ")
                         : ""}
                     </div>
@@ -161,13 +187,9 @@ export default function Dashboard({ user, token, onNavigate, onLogout }) {
                         style={{
                           ...layout.chip,
                           backgroundColor:
-                            p.status === "completed"
-                              ? T.green100
-                              : T.purple100,
+                            p.status === "completed" ? T.green100 : T.purple100,
                           color:
-                            p.status === "completed"
-                              ? T.green500
-                              : T.purple500,
+                            p.status === "completed" ? T.green500 : T.purple500,
                         }}
                       >
                         {p.status}
@@ -193,7 +215,14 @@ function StatCard({ icon, label, value, accent }) {
   return (
     <Card style={{ borderTop: `3px solid ${accent}`, flex: 1 }}>
       <div style={{ fontSize: "22px", marginBottom: "10px" }}>{icon}</div>
-      <div style={{ fontSize: "26px", fontWeight: "700", color: accent, marginBottom: "4px" }}>
+      <div
+        style={{
+          fontSize: "26px",
+          fontWeight: "700",
+          color: accent,
+          marginBottom: "4px",
+        }}
+      >
         {value}
       </div>
       <div style={{ fontSize: "12px", color: T.gray500, fontWeight: "500" }}>
@@ -205,12 +234,21 @@ function StatCard({ icon, label, value, accent }) {
 
 function ActionCard({ icon, title, body, btnLabel, onClick }) {
   return (
-    <Card style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px" }}>
+    <Card
+      style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px" }}
+    >
       <div style={{ fontSize: "22px" }}>{icon}</div>
       <div style={{ fontSize: "15px", fontWeight: "700", color: T.purple900 }}>
         {title}
       </div>
-      <div style={{ fontSize: "13px", color: T.gray500, lineHeight: "1.5", flex: 1 }}>
+      <div
+        style={{
+          fontSize: "13px",
+          color: T.gray500,
+          lineHeight: "1.5",
+          flex: 1,
+        }}
+      >
         {body}
       </div>
       <PrimaryBtn onClick={onClick} style={{ width: "100%", marginTop: "4px" }}>

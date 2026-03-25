@@ -1,13 +1,26 @@
 import { useState, useEffect } from "react";
 import {
-  Sidebar, PageShell, PageHeader,
-  Card, PrimaryBtn, ProgressBar,
-  EmptyState, Spinner, ErrorBanner, T,
-} from "../components/shared";
+  Sidebar,
+  PageShell,
+  PageHeader,
+  Card,
+  PrimaryBtn,
+  ProgressBar,
+  EmptyState,
+  Spinner,
+  ErrorBanner,
+  T,
+} from "../components/Shared";
 
 import API from "../config";
 
-export default function Pathways({ user, token, onNavigate, onLogout, initialState }) {
+export default function Pathways({
+  user,
+  token,
+  onNavigate,
+  onLogout,
+  initialState,
+}) {
   const [pathways, setPathways] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -60,7 +73,9 @@ export default function Pathways({ user, token, onNavigate, onLogout, initialSta
     setActivePathway(pathway);
     setView("detail");
     try {
-      const res = await fetch(`${API}/progress/${pathway._id}`, { headers: auth });
+      const res = await fetch(`${API}/progress/${pathway._id}`, {
+        headers: auth,
+      });
       const data = await res.json();
       setProgress(res.ok ? data : null);
     } catch {
@@ -71,23 +86,30 @@ export default function Pathways({ user, token, onNavigate, onLogout, initialSta
   const markComplete = async (pathwayId, moduleId) => {
     setCompletingModule(moduleId);
     try {
-      const res = await fetch(`${API}/progress/complete/${pathwayId}/${moduleId}`, {
-        method: "POST",
-        headers: { ...auth, "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
+      const res = await fetch(
+        `${API}/progress/complete/${pathwayId}/${moduleId}`,
+        {
+          method: "POST",
+          headers: { ...auth, "Content-Type": "application/json" },
+          body: JSON.stringify({}),
+        },
+      );
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
 
       setProgress(data.progress);
 
       // Refresh pathway so module shows as complete
-      const pRes = await fetch(`${API}/pathway/${pathwayId}`, { headers: auth });
+      const pRes = await fetch(`${API}/pathway/${pathwayId}`, {
+        headers: auth,
+      });
       if (pRes.ok) setActivePathway(await pRes.json());
       fetchPathways();
 
       if (data.newBadges?.length > 0) {
-        alert(`🏅 Badge unlocked: ${data.newBadges.map((b) => b.title).join(", ")}`);
+        alert(
+          `🏅 Badge unlocked: ${data.newBadges.map((b) => b.title).join(", ")}`,
+        );
       }
     } catch (err) {
       alert(err.message);
@@ -98,14 +120,19 @@ export default function Pathways({ user, token, onNavigate, onLogout, initialSta
 
   const isCompleted = (moduleId) =>
     progress?.completedModules?.some(
-      (cm) => cm.moduleId === moduleId || cm.moduleId?._id === moduleId
+      (cm) => cm.moduleId === moduleId || cm.moduleId?._id === moduleId,
     ) || false;
 
   // ── LIST VIEW ──────────────────────────────────────────────────
   if (view === "list") {
     return (
       <div style={layout.page}>
-        <Sidebar user={user} active="pathways" onNavigate={onNavigate} onLogout={onLogout} />
+        <Sidebar
+          user={user}
+          active="pathways"
+          onNavigate={onNavigate}
+          onLogout={onLogout}
+        />
         <PageShell>
           <PageHeader
             title="My Pathways"
@@ -120,13 +147,32 @@ export default function Pathways({ user, token, onNavigate, onLogout, initialSta
           {genError && <ErrorBanner message={genError} />}
 
           {generating && (
-            <Card style={{ marginBottom: "20px", display: "flex", alignItems: "center", gap: "14px" }}>
+            <Card
+              style={{
+                marginBottom: "20px",
+                display: "flex",
+                alignItems: "center",
+                gap: "14px",
+              }}
+            >
               <div style={s.genSpinner} />
               <div>
-                <div style={{ fontWeight: "600", color: T.purple900, fontSize: "14px" }}>
+                <div
+                  style={{
+                    fontWeight: "600",
+                    color: T.purple900,
+                    fontSize: "14px",
+                  }}
+                >
                   Generating your pathway with Gemini AI…
                 </div>
-                <div style={{ fontSize: "12px", color: T.gray500, marginTop: "3px" }}>
+                <div
+                  style={{
+                    fontSize: "12px",
+                    color: T.gray500,
+                    marginTop: "3px",
+                  }}
+                >
                   This usually takes 10–20 seconds. Please wait.
                 </div>
               </div>
@@ -149,7 +195,11 @@ export default function Pathways({ user, token, onNavigate, onLogout, initialSta
           ) : (
             <div style={s.grid}>
               {pathways.map((p) => (
-                <PathwayCard key={p._id} pathway={p} onClick={() => openPathway(p)} />
+                <PathwayCard
+                  key={p._id}
+                  pathway={p}
+                  onClick={() => openPathway(p)}
+                />
               ))}
             </div>
           )}
@@ -165,10 +215,22 @@ export default function Pathways({ user, token, onNavigate, onLogout, initialSta
 
   return (
     <div style={layout.page}>
-      <Sidebar user={user} active="pathways" onNavigate={onNavigate} onLogout={onLogout} />
+      <Sidebar
+        user={user}
+        active="pathways"
+        onNavigate={onNavigate}
+        onLogout={onLogout}
+      />
       <PageShell>
         {/* Back */}
-        <button style={s.backBtn} onClick={() => { setView("list"); setActivePathway(null); setProgress(null); }}>
+        <button
+          style={s.backBtn}
+          onClick={() => {
+            setView("list");
+            setActivePathway(null);
+            setProgress(null);
+          }}
+        >
           ← Back to Pathways
         </button>
 
@@ -239,14 +301,23 @@ function PathwayCard({ pathway, onClick }) {
       <div style={s.pathwayDomain}>
         {pathway.assessment?.domain ?? "STEAM"} ·{" "}
         {pathway.assessment?.subfield
-          ? pathway.assessment.subfield.split("_").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
+          ? pathway.assessment.subfield
+              .split("_")
+              .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+              .join(" ")
           : ""}
       </div>
       <h3 style={s.pathwayTitle}>{pathway.title}</h3>
       <p style={s.pathwaySummary}>{pathway.summary}</p>
       <div style={s.pathwayMeta}>
         <span style={s.metaChip}>{total} modules</span>
-        <span style={{ ...s.metaChip, backgroundColor: statusColor(pathway.status) + "20", color: statusColor(pathway.status) }}>
+        <span
+          style={{
+            ...s.metaChip,
+            backgroundColor: statusColor(pathway.status) + "20",
+            color: statusColor(pathway.status),
+          }}
+        >
           {pathway.status}
         </span>
       </div>
@@ -259,30 +330,47 @@ function PathwayCard({ pathway, onClick }) {
 function ModuleCard({ module, index, completed, completing, onComplete }) {
   const [open, setOpen] = useState(false);
 
-  const diffColor = { beginner: T.green500, intermediate: T.amber500, advanced: T.red500 };
+  const diffColor = {
+    beginner: T.green500,
+    intermediate: T.amber500,
+    advanced: T.red500,
+  };
 
   return (
-    <div style={{
-      ...s.moduleCard,
-      borderLeft: `4px solid ${completed ? T.green500 : T.purple500}`,
-    }}>
+    <div
+      style={{
+        ...s.moduleCard,
+        borderLeft: `4px solid ${completed ? T.green500 : T.purple500}`,
+      }}
+    >
       <div style={s.moduleHeader} onClick={() => setOpen(!open)}>
         <div style={s.moduleLeft}>
-          <div style={{
-            ...s.moduleNum,
-            backgroundColor: completed ? T.green500 : T.purple500,
-          }}>
+          <div
+            style={{
+              ...s.moduleNum,
+              backgroundColor: completed ? T.green500 : T.purple500,
+            }}
+          >
             {completed ? "✓" : index}
           </div>
           <div>
             <div style={s.moduleTitle}>{module.title}</div>
             <div style={s.moduleMeta}>
-              <span style={{ color: diffColor[module.difficulty] ?? T.gray500, fontWeight: 600 }}>
+              <span
+                style={{
+                  color: diffColor[module.difficulty] ?? T.gray500,
+                  fontWeight: 600,
+                }}
+              >
                 {module.difficulty}
               </span>
-              {" · "}{module.estimatedHours}h{" · "}
+              {" · "}
+              {module.estimatedHours}h{" · "}
               <span style={{ color: T.purple500 }}>
-                {module.domain?.split("_").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
+                {module.domain
+                  ?.split("_")
+                  .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                  .join(" ")}
               </span>
             </div>
           </div>
@@ -305,16 +393,29 @@ function ModuleCard({ module, index, completed, completing, onComplete }) {
             <div style={s.resourcesSection}>
               <div style={s.resourcesTitle}>Resources</div>
               {module.resources.map((r, i) => (
-                <a key={i} href={r.url} target="_blank" rel="noopener noreferrer" style={s.resource}>
+                <a
+                  key={i}
+                  href={r.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={s.resource}
+                >
                   <div>
                     <div style={s.resourceName}>{r.title}</div>
                     <div style={s.resourceMeta}>
                       {r.source} · {r.format} ·{" "}
-                      <span style={{ color: r.isFree ? T.green500 : T.amber500, fontWeight: 600 }}>
+                      <span
+                        style={{
+                          color: r.isFree ? T.green500 : T.amber500,
+                          fontWeight: 600,
+                        }}
+                      >
                         {r.isFree ? "Free" : "Paid"}
                       </span>
                       {r.isValidated === false && (
-                        <span style={{ color: T.red500, marginLeft: "8px" }}>⚠ Flagged</span>
+                        <span style={{ color: T.red500, marginLeft: "8px" }}>
+                          ⚠ Flagged
+                        </span>
                       )}
                     </div>
                   </div>
@@ -342,7 +443,9 @@ function ModuleCard({ module, index, completed, completing, onComplete }) {
 }
 
 // ── Helpers ──────────────────────────────────────────────────────
-const statusColor = (s) => ({ active: T.purple500, completed: T.green500, archived: T.gray500 }[s] ?? T.gray500);
+const statusColor = (s) =>
+  ({ active: T.purple500, completed: T.green500, archived: T.gray500 })[s] ??
+  T.gray500;
 
 // ── Layout ───────────────────────────────────────────────────────
 const layout = {

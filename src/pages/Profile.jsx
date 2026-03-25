@@ -1,8 +1,15 @@
 import { useState, useEffect } from "react";
 import {
-  Sidebar, PageShell, PageHeader,
-  Card, PrimaryBtn, ErrorBanner, SuccessBanner, Spinner, T,
-} from "../components/shared";
+  Sidebar,
+  PageShell,
+  PageHeader,
+  Card,
+  PrimaryBtn,
+  ErrorBanner,
+  SuccessBanner,
+  Spinner,
+  T,
+} from "../components/Shared";
 
 import API from "../config";
 
@@ -28,18 +35,20 @@ export default function Profile({ user, token, onNavigate, onLogout }) {
     Promise.all([
       fetch(`${API}/profile`, { headers: auth }).then((r) => r.json()),
       fetch(`${API}/progress`, { headers: auth }).then((r) => r.json()),
-    ]).then(([profileData, progressData]) => {
-      if (profileData && !profileData.message) {
-        setProfile(profileData);
-        setEditForm({
-          preferredLanguage: profileData.preferredLanguage || "English",
-          timeAvailability: profileData.timeAvailability || "2_to_5hrs",
-          internetAccess: profileData.internetAccess || "moderate",
-          learningPace: profileData.learningPace || "moderate",
-        });
-      }
-      if (progressData?.summary) setAllProgress(progressData.summary);
-    }).finally(() => setLoading(false));
+    ])
+      .then(([profileData, progressData]) => {
+        if (profileData && !profileData.message) {
+          setProfile(profileData);
+          setEditForm({
+            preferredLanguage: profileData.preferredLanguage || "English",
+            timeAvailability: profileData.timeAvailability || "2_to_5hrs",
+            internetAccess: profileData.internetAccess || "moderate",
+            learningPace: profileData.learningPace || "moderate",
+          });
+        }
+        if (progressData?.summary) setAllProgress(progressData.summary);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const handleSave = async () => {
@@ -65,16 +74,30 @@ export default function Profile({ user, token, onNavigate, onLogout }) {
   };
 
   // Aggregate stats across all pathways
-  const totalBadges = allProgress.reduce((acc, p) => acc + (p.badgesEarned || 0), 0);
-  const totalModulesCompleted = allProgress.reduce((acc, p) => acc + (p.completedModules || 0), 0);
+  const totalBadges = allProgress.reduce(
+    (acc, p) => acc + (p.badgesEarned || 0),
+    0,
+  );
+  const totalModulesCompleted = allProgress.reduce(
+    (acc, p) => acc + (p.completedModules || 0),
+    0,
+  );
   const avgCompletion =
     allProgress.length > 0
-      ? Math.round(allProgress.reduce((acc, p) => acc + p.completionRate, 0) / allProgress.length)
+      ? Math.round(
+          allProgress.reduce((acc, p) => acc + p.completionRate, 0) /
+            allProgress.length,
+        )
       : 0;
 
   return (
     <div style={layout.page}>
-      <Sidebar user={user} active="profile" onNavigate={onNavigate} onLogout={onLogout} />
+      <Sidebar
+        user={user}
+        active="profile"
+        onNavigate={onNavigate}
+        onLogout={onLogout}
+      />
       <PageShell>
         <PageHeader
           title="My Profile"
@@ -85,12 +108,16 @@ export default function Profile({ user, token, onNavigate, onLogout }) {
           <Spinner />
         ) : (
           <div style={layout.grid}>
-
             {/* Left column */}
             <div style={layout.left}>
-
               {/* Identity card */}
-              <Card style={{ marginBottom: "16px", textAlign: "center", padding: "32px 24px" }}>
+              <Card
+                style={{
+                  marginBottom: "16px",
+                  textAlign: "center",
+                  padding: "32px 24px",
+                }}
+              >
                 <div style={s.bigAvatar}>
                   {user?.name?.charAt(0).toUpperCase()}
                 </div>
@@ -98,7 +125,8 @@ export default function Profile({ user, token, onNavigate, onLogout }) {
                 <div style={s.profileEmail}>{user?.email}</div>
                 {profile?.skillLevel && (
                   <div style={s.skillBadge}>
-                    {skillIcon[profile.skillLevel]} {capitalize(profile.skillLevel)}
+                    {skillIcon[profile.skillLevel]}{" "}
+                    {capitalize(profile.skillLevel)}
                   </div>
                 )}
               </Card>
@@ -108,16 +136,21 @@ export default function Profile({ user, token, onNavigate, onLogout }) {
                 <div style={s.statsTitle}>Learning Stats</div>
                 <div style={s.statsGrid}>
                   <StatItem value={allProgress.length} label="Pathways" />
-                  <StatItem value={totalModulesCompleted} label="Modules Done" />
+                  <StatItem
+                    value={totalModulesCompleted}
+                    label="Modules Done"
+                  />
                   <StatItem value={totalBadges} label="Badges" />
-                  <StatItem value={`${avgCompletion}%`} label="Avg Completion" />
+                  <StatItem
+                    value={`${avgCompletion}%`}
+                    label="Avg Completion"
+                  />
                 </div>
               </Card>
             </div>
 
             {/* Right column */}
             <div style={layout.right}>
-
               {/* Learning preferences */}
               <Card style={{ marginBottom: "16px" }}>
                 <div style={s.cardHeaderRow}>
@@ -128,7 +161,10 @@ export default function Profile({ user, token, onNavigate, onLogout }) {
                     </button>
                   ) : (
                     <div style={{ display: "flex", gap: "8px" }}>
-                      <button style={s.cancelBtn} onClick={() => setEditing(false)}>
+                      <button
+                        style={s.cancelBtn}
+                        onClick={() => setEditing(false)}
+                      >
                         Cancel
                       </button>
                       <PrimaryBtn onClick={handleSave} disabled={saving}>
@@ -143,43 +179,69 @@ export default function Profile({ user, token, onNavigate, onLogout }) {
 
                 {!editing ? (
                   <div style={s.prefGrid}>
-                    <PrefRow label="Domains"       value={profile?.steamDomains?.map(capitalize).join(", ") || "—"} />
-                    <PrefRow label="Skill Level"   value={capitalize(profile?.skillLevel) || "—"} />
-                    <PrefRow label="Time / week"   value={formatTime(profile?.timeAvailability)} />
-                    <PrefRow label="Internet"      value={capitalize(profile?.internetAccess) || "—"} />
-                    <PrefRow label="Pace"          value={capitalize(profile?.learningPace) || "—"} />
-                    <PrefRow label="Language"      value={profile?.preferredLanguage || "—"} />
+                    <PrefRow
+                      label="Domains"
+                      value={
+                        profile?.steamDomains?.map(capitalize).join(", ") || "—"
+                      }
+                    />
+                    <PrefRow
+                      label="Skill Level"
+                      value={capitalize(profile?.skillLevel) || "—"}
+                    />
+                    <PrefRow
+                      label="Time / week"
+                      value={formatTime(profile?.timeAvailability)}
+                    />
+                    <PrefRow
+                      label="Internet"
+                      value={capitalize(profile?.internetAccess) || "—"}
+                    />
+                    <PrefRow
+                      label="Pace"
+                      value={capitalize(profile?.learningPace) || "—"}
+                    />
+                    <PrefRow
+                      label="Language"
+                      value={profile?.preferredLanguage || "—"}
+                    />
                   </div>
                 ) : (
                   <div>
                     <SelectField
                       label="Time available per week"
                       value={editForm.timeAvailability}
-                      onChange={(v) => setEditForm({ ...editForm, timeAvailability: v })}
+                      onChange={(v) =>
+                        setEditForm({ ...editForm, timeAvailability: v })
+                      }
                       options={[
                         { value: "less_than_2hrs", label: "Less than 2 hours" },
-                        { value: "2_to_5hrs",      label: "2 to 5 hours" },
+                        { value: "2_to_5hrs", label: "2 to 5 hours" },
                         { value: "more_than_5hrs", label: "5+ hours" },
                       ]}
                     />
                     <SelectField
                       label="Internet access"
                       value={editForm.internetAccess}
-                      onChange={(v) => setEditForm({ ...editForm, internetAccess: v })}
+                      onChange={(v) =>
+                        setEditForm({ ...editForm, internetAccess: v })
+                      }
                       options={[
-                        { value: "low",      label: "Low" },
+                        { value: "low", label: "Low" },
                         { value: "moderate", label: "Moderate" },
-                        { value: "high",     label: "High" },
+                        { value: "high", label: "High" },
                       ]}
                     />
                     <SelectField
                       label="Learning pace"
                       value={editForm.learningPace}
-                      onChange={(v) => setEditForm({ ...editForm, learningPace: v })}
+                      onChange={(v) =>
+                        setEditForm({ ...editForm, learningPace: v })
+                      }
                       options={[
-                        { value: "slow",     label: "Slow" },
+                        { value: "slow", label: "Slow" },
                         { value: "moderate", label: "Moderate" },
-                        { value: "fast",     label: "Fast" },
+                        { value: "fast", label: "Fast" },
                       ]}
                     />
                     <div style={s.field}>
@@ -187,7 +249,12 @@ export default function Profile({ user, token, onNavigate, onLogout }) {
                       <input
                         style={s.input}
                         value={editForm.preferredLanguage}
-                        onChange={(e) => setEditForm({ ...editForm, preferredLanguage: e.target.value })}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm,
+                            preferredLanguage: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </div>
@@ -214,12 +281,16 @@ export default function Profile({ user, token, onNavigate, onLogout }) {
                   <div style={s.cardTitle}>Pathway Progress</div>
                   {allProgress.map((p, i) => (
                     <div key={i} style={s.progressRow}>
-                      <div style={s.progressLabel}>{p.pathwayTitle || "Untitled Pathway"}</div>
+                      <div style={s.progressLabel}>
+                        {p.pathwayTitle || "Untitled Pathway"}
+                      </div>
                       <div style={s.progressMeta}>
                         {p.completedModules}/{p.totalModules} modules
                       </div>
                       <div style={s.track}>
-                        <div style={{ ...s.fill, width: `${p.completionRate}%` }} />
+                        <div
+                          style={{ ...s.fill, width: `${p.completionRate}%` }}
+                        />
                       </div>
                     </div>
                   ))}
@@ -256,9 +327,15 @@ function SelectField({ label, value, onChange, options }) {
   return (
     <div style={s.field}>
       <label style={s.label}>{label}</label>
-      <select style={s.select} value={value} onChange={(e) => onChange(e.target.value)}>
+      <select
+        style={s.select}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
         {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
         ))}
       </select>
     </div>
@@ -266,12 +343,16 @@ function SelectField({ label, value, onChange, options }) {
 }
 
 // ── Helpers ──────────────────────────────────────────────────────
-const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
-const formatTime = (val) => ({
-  less_than_2hrs: "< 2 hours/week",
-  "2_to_5hrs": "2–5 hours/week",
-  more_than_5hrs: "5+ hours/week",
-}[val] ?? val ?? "—");
+const capitalize = (str) =>
+  str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+const formatTime = (val) =>
+  ({
+    less_than_2hrs: "< 2 hours/week",
+    "2_to_5hrs": "2–5 hours/week",
+    more_than_5hrs: "5+ hours/week",
+  })[val] ??
+  val ??
+  "—";
 
 const skillIcon = { beginner: "🌱", intermediate: "📈", advanced: "🚀" };
 

@@ -1,8 +1,14 @@
 import { useState, useEffect } from "react";
 import {
-  Sidebar, PageShell, PageHeader,
-  Card, PrimaryBtn, ErrorBanner, Spinner, T,
-} from "../components/shared";
+  Sidebar,
+  PageShell,
+  PageHeader,
+  Card,
+  PrimaryBtn,
+  ErrorBanner,
+  Spinner,
+  T,
+} from "../components/Shared";
 
 import API from "../config";
 
@@ -34,7 +40,9 @@ export default function Assessment({ user, token, onNavigate, onLogout }) {
     fetch(`${API}/assessment/subfields`)
       .then((r) => r.json())
       .then((data) => setSubfields(data))
-      .catch(() => setError("Could not load domain options. Is the server running?"))
+      .catch(() =>
+        setError("Could not load domain options. Is the server running?"),
+      )
       .finally(() => setLoadingSubfields(false));
   }, []);
 
@@ -88,21 +96,46 @@ export default function Assessment({ user, token, onNavigate, onLogout }) {
   if (done) {
     return (
       <div style={layout.page}>
-        <Sidebar user={user} active="assessment" onNavigate={onNavigate} onLogout={onLogout} />
+        <Sidebar
+          user={user}
+          active="assessment"
+          onNavigate={onNavigate}
+          onLogout={onLogout}
+        />
         <PageShell>
           <div style={layout.centred}>
-            <Card style={{ maxWidth: "480px", textAlign: "center", padding: "48px 40px" }}>
+            <Card
+              style={{
+                maxWidth: "480px",
+                textAlign: "center",
+                padding: "48px 40px",
+              }}
+            >
               <div style={s.successIcon}>✓</div>
               <h2 style={s.successTitle}>Assessment submitted!</h2>
               <p style={s.successBody}>
-                Your profile has been saved. Now generate your personalised
-                AI learning pathway.
+                Your profile has been saved. Now generate your personalised AI
+                learning pathway.
               </p>
-              <div style={{ display: "flex", gap: "12px", justifyContent: "center", marginTop: "28px" }}>
-                <PrimaryBtn onClick={() => onNavigate("pathways", { generateFrom: done.assessmentId })}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "12px",
+                  justifyContent: "center",
+                  marginTop: "28px",
+                }}
+              >
+                <PrimaryBtn
+                  onClick={() =>
+                    onNavigate("pathways", { generateFrom: done.assessmentId })
+                  }
+                >
                   Generate My Pathway →
                 </PrimaryBtn>
-                <button style={s.ghostBtn} onClick={() => onNavigate("dashboard")}>
+                <button
+                  style={s.ghostBtn}
+                  onClick={() => onNavigate("dashboard")}
+                >
                   Go to Dashboard
                 </button>
               </div>
@@ -115,7 +148,12 @@ export default function Assessment({ user, token, onNavigate, onLogout }) {
 
   return (
     <div style={layout.page}>
-      <Sidebar user={user} active="assessment" onNavigate={onNavigate} onLogout={onLogout} />
+      <Sidebar
+        user={user}
+        active="assessment"
+        onNavigate={onNavigate}
+        onLogout={onLogout}
+      />
       <PageShell>
         <PageHeader
           title="Learning Assessment"
@@ -160,7 +198,9 @@ export default function Assessment({ user, token, onNavigate, onLogout }) {
               {step === 0 && (
                 <div style={s.stepContent}>
                   <h3 style={s.stepTitle}>What do you want to learn?</h3>
-                  <p style={s.stepSub}>Choose your STEAM domain, then pick a specific field.</p>
+                  <p style={s.stepSub}>
+                    Choose your STEAM domain, then pick a specific field.
+                  </p>
 
                   <div style={s.field}>
                     <label style={s.label}>Domain</label>
@@ -170,7 +210,9 @@ export default function Assessment({ user, token, onNavigate, onLogout }) {
                           key={domain}
                           style={{
                             ...s.optionChip,
-                            ...(form.domain === domain ? s.optionChipActive : {}),
+                            ...(form.domain === domain
+                              ? s.optionChipActive
+                              : {}),
                           }}
                           onClick={() => set("domain", domain)}
                         >
@@ -191,7 +233,9 @@ export default function Assessment({ user, token, onNavigate, onLogout }) {
                             key={sf}
                             style={{
                               ...s.subfieldChip,
-                              ...(form.subfield === sf ? s.subfieldChipActive : {}),
+                              ...(form.subfield === sf
+                                ? s.subfieldChipActive
+                                : {}),
                             }}
                             onClick={() => set("subfield", sf)}
                           >
@@ -208,17 +252,23 @@ export default function Assessment({ user, token, onNavigate, onLogout }) {
               {step === 1 && (
                 <div style={s.stepContent}>
                   <h3 style={s.stepTitle}>Your current level & goals</h3>
-                  <p style={s.stepSub}>This helps us calibrate the depth of your pathway.</p>
+                  <p style={s.stepSub}>
+                    This helps us calibrate the depth of your pathway.
+                  </p>
 
                   <div style={s.field}>
-                    <label style={s.label}>Current skill level in {formatSubfield(form.subfield)}</label>
+                    <label style={s.label}>
+                      Current skill level in {formatSubfield(form.subfield)}
+                    </label>
                     <div style={s.optionGrid}>
                       {["beginner", "intermediate", "advanced"].map((level) => (
                         <div
                           key={level}
                           style={{
                             ...s.optionChip,
-                            ...(form.skillLevel === level ? s.optionChipActive : {}),
+                            ...(form.skillLevel === level
+                              ? s.optionChipActive
+                              : {}),
                           }}
                           onClick={() => set("skillLevel", level)}
                         >
@@ -237,7 +287,10 @@ export default function Assessment({ user, token, onNavigate, onLogout }) {
                       value={form.goals}
                       onChange={(e) => set("goals", e.target.value)}
                     />
-                    <span style={s.hint}>Be specific — the AI uses this to personalise your pathway.</span>
+                    <span style={s.hint}>
+                      Be specific — the AI uses this to personalise your
+                      pathway.
+                    </span>
                   </div>
                 </div>
               )}
@@ -247,7 +300,8 @@ export default function Assessment({ user, token, onNavigate, onLogout }) {
                 <div style={s.stepContent}>
                   <h3 style={s.stepTitle}>Your learning context</h3>
                   <p style={s.stepSub}>
-                    We use this to recommend resources that fit your real-world situation.
+                    We use this to recommend resources that fit your real-world
+                    situation.
                   </p>
 
                   <SelectField
@@ -256,7 +310,7 @@ export default function Assessment({ user, token, onNavigate, onLogout }) {
                     onChange={(v) => set("timeAvailability", v)}
                     options={[
                       { value: "less_than_2hrs", label: "Less than 2 hours" },
-                      { value: "2_to_5hrs",      label: "2 to 5 hours" },
+                      { value: "2_to_5hrs", label: "2 to 5 hours" },
                       { value: "more_than_5hrs", label: "More than 5 hours" },
                     ]}
                   />
@@ -266,9 +320,18 @@ export default function Assessment({ user, token, onNavigate, onLogout }) {
                     value={form.internetAccess}
                     onChange={(v) => set("internetAccess", v)}
                     options={[
-                      { value: "low",      label: "Low — limited or expensive data" },
-                      { value: "moderate", label: "Moderate — reliable most of the time" },
-                      { value: "high",     label: "High — fast and always available" },
+                      {
+                        value: "low",
+                        label: "Low — limited or expensive data",
+                      },
+                      {
+                        value: "moderate",
+                        label: "Moderate — reliable most of the time",
+                      },
+                      {
+                        value: "high",
+                        label: "High — fast and always available",
+                      },
                     ]}
                   />
 
@@ -277,9 +340,12 @@ export default function Assessment({ user, token, onNavigate, onLogout }) {
                     value={form.learningPace}
                     onChange={(v) => set("learningPace", v)}
                     options={[
-                      { value: "slow",     label: "Slow — I like to take my time" },
-                      { value: "moderate", label: "Moderate — steady progress" },
-                      { value: "fast",     label: "Fast — I want to move quickly" },
+                      { value: "slow", label: "Slow — I like to take my time" },
+                      {
+                        value: "moderate",
+                        label: "Moderate — steady progress",
+                      },
+                      { value: "fast", label: "Fast — I want to move quickly" },
                     ]}
                   />
 
@@ -300,16 +366,40 @@ export default function Assessment({ user, token, onNavigate, onLogout }) {
               {step === 3 && (
                 <div style={s.stepContent}>
                   <h3 style={s.stepTitle}>Review your assessment</h3>
-                  <p style={s.stepSub}>Check everything looks right before we generate your pathway.</p>
+                  <p style={s.stepSub}>
+                    Check everything looks right before we generate your
+                    pathway.
+                  </p>
 
                   <div style={s.reviewGrid}>
-                    <ReviewRow label="Domain"        value={capitalize(form.domain)} />
-                    <ReviewRow label="Subfield"      value={formatSubfield(form.subfield)} />
-                    <ReviewRow label="Skill Level"   value={capitalize(form.skillLevel)} />
-                    <ReviewRow label="Time/week"     value={formatConstraint("timeAvailability", form.timeAvailability)} />
-                    <ReviewRow label="Internet"      value={capitalize(form.internetAccess)} />
-                    <ReviewRow label="Pace"          value={capitalize(form.learningPace)} />
-                    <ReviewRow label="Language"      value={form.preferredLanguage} />
+                    <ReviewRow label="Domain" value={capitalize(form.domain)} />
+                    <ReviewRow
+                      label="Subfield"
+                      value={formatSubfield(form.subfield)}
+                    />
+                    <ReviewRow
+                      label="Skill Level"
+                      value={capitalize(form.skillLevel)}
+                    />
+                    <ReviewRow
+                      label="Time/week"
+                      value={formatConstraint(
+                        "timeAvailability",
+                        form.timeAvailability,
+                      )}
+                    />
+                    <ReviewRow
+                      label="Internet"
+                      value={capitalize(form.internetAccess)}
+                    />
+                    <ReviewRow
+                      label="Pace"
+                      value={capitalize(form.learningPace)}
+                    />
+                    <ReviewRow
+                      label="Language"
+                      value={form.preferredLanguage}
+                    />
                   </div>
 
                   <div style={s.goalsBox}>
@@ -322,7 +412,10 @@ export default function Assessment({ user, token, onNavigate, onLogout }) {
               {/* ── Navigation buttons ── */}
               <div style={s.navRow}>
                 {step > 0 && (
-                  <button style={s.backBtn} onClick={() => setStep((p) => p - 1)}>
+                  <button
+                    style={s.backBtn}
+                    onClick={() => setStep((p) => p - 1)}
+                  >
                     ← Back
                   </button>
                 )}
@@ -335,10 +428,7 @@ export default function Assessment({ user, token, onNavigate, onLogout }) {
                     Continue →
                   </PrimaryBtn>
                 ) : (
-                  <PrimaryBtn
-                    onClick={handleSubmit}
-                    disabled={submitting}
-                  >
+                  <PrimaryBtn onClick={handleSubmit} disabled={submitting}>
                     {submitting ? "Submitting…" : "Submit Assessment"}
                   </PrimaryBtn>
                 )}
@@ -362,7 +452,9 @@ function SelectField({ label, value, onChange, options }) {
         onChange={(e) => onChange(e.target.value)}
       >
         {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
         ))}
       </select>
     </div>
@@ -379,7 +471,8 @@ function ReviewRow({ label, value }) {
 }
 
 // ── Helpers ──────────────────────────────────────────────────────
-const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+const capitalize = (str) =>
+  str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 const formatSubfield = (sf) =>
   sf ? sf.split("_").map(capitalize).join(" ") : "";
 const formatConstraint = (key, val) => {
