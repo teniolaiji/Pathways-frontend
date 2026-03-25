@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const API = "http://localhost:5000/api";
+import API from "../config";
 
 export default function Register({ onGoLogin }) {
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
