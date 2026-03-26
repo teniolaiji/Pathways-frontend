@@ -45,10 +45,14 @@ export const T = {
 // ─── Shared sidebar ─────────────────────────────────────────────
 export function Sidebar({ user, active, onNavigate, onLogout }) {
   const items = [
-    { key: "dashboard", icon: "⊞", label: "Dashboard" },
-    { key: "assessment", icon: "✎", label: "Assessment" },
+    { key: "dashboard",  icon: "⊞", label: "Dashboard"  },
+    { key: "assessment", icon: "✎", label: "Assessment"  },
     { key: "pathways",   icon: "◈", label: "My Pathways" },
-    { key: "profile",    icon: "◎", label: "Profile"    },
+    { key: "profile",    icon: "◎", label: "Profile"     },
+    // Only show admin link for admin users
+    ...(user?.role === "admin"
+      ? [{ key: "admin", icon: "🛡️", label: "Admin Panel" }]
+      : []),
   ];
 
   return (
