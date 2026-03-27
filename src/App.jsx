@@ -1,16 +1,34 @@
 import { useState } from "react";
 import "./index.css";
 
-import Login      from "./pages/Login";
-import Register   from "./pages/Register";
-import Dashboard  from "./pages/Dashboard";
-import Assessment from "./pages/Assessment";
-import Pathways   from "./pages/Pathways";
-import Profile    from "./pages/Profile";
-import Admin      from "./pages/Admin";
+import Login       from "./pages/Login";
+import Register    from "./pages/Register";
+import Dashboard   from "./pages/Dashboard";
+import Assessment  from "./pages/Assessment";
+import Pathways    from "./pages/Pathways";
+import Profile     from "./pages/Profile";
+import Admin       from "./pages/Admin";
+import VerifyEmail from "./pages/VerifyEmail";
 
 export default function App() {
-  // Restore session from localStorage
+  // ── Check URL for special pages first ───────────────────────
+  // These pages must work even when the user is not logged in
+  const path   = window.location.pathname;
+  const search = window.location.search;
+
+  // Handle /verify-email?token=xxx
+  if (path === "/verify-email" || search.includes("token=") && path.includes("verify")) {
+    return (
+      <VerifyEmail
+        onGoLogin={() => {
+          window.history.pushState({}, "", "/");
+          window.location.reload();
+        }}
+      />
+    );
+  }
+
+  // ── Restore session ──────────────────────────────────────────
   const savedUser = (() => {
     try { return JSON.parse(localStorage.getItem("user")); }
     catch { return null; }
@@ -39,29 +57,36 @@ export default function App() {
   };
 
   const handleNavigate = (destination, state = null) => {
-    // Block non-admins from accessing the admin page
     if (destination === "admin" && user?.role !== "admin") return;
     setPageState(state);
     setPage(destination);
   };
 
-  const pageProps = { user, token, onNavigate: handleNavigate, onLogout: handleLogout };
+  const pageProps = {
+    user, token,
+    onNavigate: handleNavigate,
+    onLogout:   handleLogout,
+  };
 
-  // Unauthenticated
+  // ── Unauthenticated ──────────────────────────────────────────
   if (!user || !token) {
     if (screen === "register") {
       return <Register onGoLogin={() => setScreen("login")} />;
     }
-    return <Login onLogin={handleLogin} onGoRegister={() => setScreen("register")} />;
+    return (
+      <Login
+        onLogin={handleLogin}
+        onGoRegister={() => setScreen("register")}
+      />
+    );
   }
 
-  // Authenticated — role-based routing
+  // ── Authenticated ────────────────────────────────────────────
   switch (page) {
     case "assessment": return <Assessment {...pageProps} />;
     case "pathways":   return <Pathways   {...pageProps} initialState={pageState} />;
     case "profile":    return <Profile    {...pageProps} />;
     case "admin":
-      // Double-check role on render as well as on navigate
       if (user?.role !== "admin") return <Dashboard {...pageProps} />;
       return <Admin {...pageProps} />;
     case "dashboard":
