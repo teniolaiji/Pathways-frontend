@@ -369,7 +369,7 @@ function ModuleCard({ module, index, completed, completing, onComplete }) {
           {module.resources?.length > 0 && (
             <div style={{ marginBottom:"16px" }}>
               <div style={{ fontSize:"11px", fontWeight:"700", color:T.gray700, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:"8px" }}>Resources</div>
-              {module.resources.map((r,i) => (
+              {module.resources.filter((r) => r.isValidated !== false).map((r,i) => (
                 <a key={i} href={r.url} target="_blank" rel="noopener noreferrer"
                   style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 14px",
                     backgroundColor:T.gray50, border:`1px solid ${T.gray200}`, borderRadius:T.radiusSm,
