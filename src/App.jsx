@@ -12,21 +12,6 @@ import Admin       from "./pages/Admin";
 import VerifyEmail from "./pages/VerifyEmail";
 
 export default function App() {
-  // ── Handle /verify-email URL first ──────────────────────────
-  const path   = window.location.pathname;
-  const search = window.location.search;
-
-  if (path === "/verify-email" || (search.includes("token=") && path.includes("verify"))) {
-    return (
-      <VerifyEmail
-        onGoLogin={() => {
-          window.history.pushState({}, "", "/");
-          window.location.reload();
-        }}
-      />
-    );
-  }
-
   // ── Restore session ──────────────────────────────────────────
   const savedUser = (() => {
     try { return JSON.parse(localStorage.getItem("user")); }
@@ -36,10 +21,27 @@ export default function App() {
 
   const [user,      setUser]      = useState(savedUser);
   const [token,     setToken]     = useState(savedToken);
-  const [screen,    setScreen]    = useState("landing"); // starts on landing
+  const [screen,    setScreen]    = useState("landing");
   const [page,      setPage]      = useState("dashboard");
   const [pageState, setPageState] = useState(null);
 
+  // ── Handle /verify-email URL ─────────────────────────────────
+  // Must be AFTER useState calls so setScreen is available
+  const path   = window.location.pathname;
+  const search = window.location.search;
+
+  if (path === "/verify-email" || (search.includes("token=") && path.includes("verify"))) {
+    return (
+      <VerifyEmail
+        onGoLogin={() => {
+          window.history.pushState({}, "", "/");
+          setScreen("login"); // ← goes to login, not landing
+        }}
+      />
+    );
+  }
+
+  // ── Handlers ─────────────────────────────────────────────────
   const handleLogin = (userData, authToken) => {
     setUser(userData);
     setToken(authToken);
@@ -51,7 +53,7 @@ export default function App() {
     localStorage.removeItem("user");
     setUser(null);
     setToken(null);
-    setScreen("landing"); // return to landing on logout
+    setScreen("landing");
     setPage("dashboard");
   };
 
