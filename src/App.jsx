@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./index.css";
 
+import Landing     from "./pages/Landing";
 import Login       from "./pages/Login";
 import Register    from "./pages/Register";
 import Dashboard   from "./pages/Dashboard";
@@ -11,13 +12,11 @@ import Admin       from "./pages/Admin";
 import VerifyEmail from "./pages/VerifyEmail";
 
 export default function App() {
-  // ── Check URL for special pages first ───────────────────────
-  // These pages must work even when the user is not logged in
+  // ── Handle /verify-email URL first ──────────────────────────
   const path   = window.location.pathname;
   const search = window.location.search;
 
-  // Handle /verify-email?token=xxx
-  if (path === "/verify-email" || search.includes("token=") && path.includes("verify")) {
+  if (path === "/verify-email" || (search.includes("token=") && path.includes("verify"))) {
     return (
       <VerifyEmail
         onGoLogin={() => {
@@ -37,7 +36,7 @@ export default function App() {
 
   const [user,      setUser]      = useState(savedUser);
   const [token,     setToken]     = useState(savedToken);
-  const [screen,    setScreen]    = useState("login");
+  const [screen,    setScreen]    = useState("landing"); // starts on landing
   const [page,      setPage]      = useState("dashboard");
   const [pageState, setPageState] = useState(null);
 
@@ -52,7 +51,7 @@ export default function App() {
     localStorage.removeItem("user");
     setUser(null);
     setToken(null);
-    setScreen("login");
+    setScreen("landing"); // return to landing on logout
     setPage("dashboard");
   };
 
@@ -68,29 +67,45 @@ export default function App() {
     onLogout:   handleLogout,
   };
 
-  // ── Unauthenticated ──────────────────────────────────────────
-  if (!user || !token) {
-    if (screen === "register") {
-      return <Register onGoLogin={() => setScreen("login")} />;
+  // ── Authenticated ────────────────────────────────────────────
+  if (user && token) {
+    switch (page) {
+      case "assessment": return <Assessment {...pageProps} />;
+      case "pathways":   return <Pathways   {...pageProps} initialState={pageState} />;
+      case "profile":    return <Profile    {...pageProps} />;
+      case "admin":
+        if (user?.role !== "admin") return <Dashboard {...pageProps} />;
+        return <Admin {...pageProps} />;
+      default:
+        return <Dashboard {...pageProps} />;
     }
+  }
+
+  // ── Unauthenticated ──────────────────────────────────────────
+  if (screen === "login") {
     return (
       <Login
         onLogin={handleLogin}
         onGoRegister={() => setScreen("register")}
+        onGoLanding={() => setScreen("landing")}
       />
     );
   }
 
-  // ── Authenticated ────────────────────────────────────────────
-  switch (page) {
-    case "assessment": return <Assessment {...pageProps} />;
-    case "pathways":   return <Pathways   {...pageProps} initialState={pageState} />;
-    case "profile":    return <Profile    {...pageProps} />;
-    case "admin":
-      if (user?.role !== "admin") return <Dashboard {...pageProps} />;
-      return <Admin {...pageProps} />;
-    case "dashboard":
-    default:
-      return <Dashboard {...pageProps} />;
+  if (screen === "register") {
+    return (
+      <Register
+        onGoLogin={() => setScreen("login")}
+        onGoLanding={() => setScreen("landing")}
+      />
+    );
   }
+
+  // Default: landing page
+  return (
+    <Landing
+      onGoLogin={() => setScreen("login")}
+      onGoRegister={() => setScreen("register")}
+    />
+  );
 }
