@@ -1,2 +1,2 @@
-const API = import.meta.env.VITE_API_URL || "/api";
+const API = "/api";
 export default API;
