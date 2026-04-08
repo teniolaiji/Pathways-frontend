@@ -9,13 +9,12 @@ export default defineConfig({
     {
       name: 'generate-redirects',
       closeBundle() {
-        // Write _redirects directly into dist folder after build
         mkdirSync('dist', { recursive: true });
         writeFileSync(
           resolve('dist', '_redirects'),
-          '/api/*  https://pathways-backend-3151.onrender.com/api/:splat  200\n/*      /index.html                                             200\n'
+          '/api/*  https://pathways-backend-3151.onrender.com/api/:splat  200!\n/*      /index.html                                             200\n'
         );
-        console.log('✓ _redirects written to dist/');
+        console.log('_redirects written to dist/');
       }
     }
   ],
